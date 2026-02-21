@@ -1,241 +1,487 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Финансовый трекер</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <style>
-        :root {
-            --bg-color: var(--tg-theme-bg-color, #ffffff);
-            --text-color: var(--tg-theme-text-color, #1f2937);
-            --hint-color: var(--tg-theme-hint-color, #6b7280);
-            --secondary-bg: var(--tg-theme-secondary-bg-color, #f8fafc);
-            --accent-primary: #6366f1; /* Индиго */
-            --accent-secondary: #a855f7; /* Фиолетовый */
-            --danger-color: #ef4444; /* Красный для расходов */
-            --success-color: #10b981; /* Зеленый для доходов */
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Финансовый рентген</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f6fa;--bg-card:#ffffff;--bg-input:#eef0f5;
+  --text:#1b2a4a;--text2:#5a6a85;--text3:#99a4b8;
+  --accent:#0ea47a;--accent-light:rgba(14,164,122,.08);--accent-glow:rgba(14,164,122,.25);
+  --grad1:#0f2027;--grad2:#1a3a4a;--grad3:#0ea47a;
+  --border:#e2e6ed;--green:#0ea47a;--red:#e74c3c;--orange:#f0932b;
+  --shadow:0 1px 3px rgba(27,42,74,.04);
+  --R:14px;--Rs:10px;--Rx:8px;
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --T:.2s cubic-bezier(.4,0,.2,1);
+}
+.dark{
+  --bg:#0d1117;--bg-card:#1c2333;--bg-input:#161b22;
+  --text:#e6edf3;--text2:#8b949e;--text3:#545d68;
+  --border:#2a3340;--shadow:0 1px 3px rgba(0,0,0,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom,20px);min-height:100vh}
+.c{max-width:480px;margin:0 auto;padding:0 16px 32px}
 
-        @media (prefers-color-scheme: dark) {
-            :root { --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }
-        }
+.hdr{text-align:center;padding:20px 0 14px}
+.hdr h1{font-size:17px;font-weight:700;letter-spacing:1.5px}
+.hdr p{font-size:12px;color:var(--text3);margin-top:2px}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+.cd{background:var(--bg-card);border-radius:var(--R);padding:18px;margin-bottom:10px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.cd-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.cd-label .icon{font-size:13px}
 
-        h1 {
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 5px;
-            font-weight: 800;
-        }
+/* Section toggle */
+.sec-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-user-select:none;user-select:none}
+.sec-toggle .arrow{font-size:10px;color:var(--text3);transition:transform .3s ease}
+.sec-toggle .arrow.open{transform:rotate(180deg)}
+.sec-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.sec-body.open{max-height:2000px}
 
-        p.subtitle {
-            text-align: center;
-            color: var(--hint-color);
-            font-size: 14px;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
+/* Row */
+.row{margin-bottom:12px}
+.row:last-child{margin-bottom:0}
+.row-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.row-hint{font-size:10px;color:var(--text3);font-weight:400}
+.row-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row-inputs.single{grid-template-columns:1fr}
+.col-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:3px}
+.fin-input{width:100%;padding:9px 12px;border-radius:var(--Rx);border:1.5px solid var(--border);background:var(--bg-input);color:var(--text);font-size:14px;font-weight:500;font-family:var(--font);transition:var(--T);text-align:right}
+.fin-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.fin-input::placeholder{color:var(--text3);font-weight:400}
 
-        .card {
-            background-color: var(--secondary-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(156, 163, 175, 0.1);
-        }
+/* Subtotal */
+.subtotal{display:flex;justify-content:space-between;align-items:center;padding:10px 0;margin-top:8px;border-top:1.5px solid var(--border)}
+.subtotal-label{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.subtotal-val{font-size:16px;font-weight:800;color:var(--accent)}
 
-        .type-selector {
-            display: flex;
-            background: rgba(156, 163, 175, 0.1);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 20px;
-        }
+/* Result card */
+.res{background:linear-gradient(135deg,var(--grad1) 0%,var(--grad2) 50%,var(--grad3) 100%);border:none;color:#fff;text-align:center;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(15,32,39,.2)}
+.res::before{content:'';position:absolute;top:-50%;right:-30%;width:250px;height:250px;border-radius:50%;background:rgba(14,164,122,.08);pointer-events:none}
+.res-label{font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:4px}
+.res-total{font-size:34px;font-weight:800;letter-spacing:-.5px;margin-bottom:16px;position:relative;z-index:1}
+.res-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;position:relative;z-index:1}
+.res-box{background:rgba(255,255,255,.08);border-radius:var(--Rs);padding:10px 8px;border:1px solid rgba(255,255,255,.06)}
+.res-box-label{font-size:9px;opacity:.6;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.res-box-val{font-size:14px;font-weight:700}
+.delta-positive{color:#5dffb4}
+.delta-negative{color:#ff7b7b}
 
-        .type-btn {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            color: var(--hint-color);
-            transition: 0.3s;
-        }
+/* Pillow section */
+.pillow-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+.pillow-row:not(:last-child){border-bottom:1px solid var(--border)}
+.pillow-label{font-size:13px;color:var(--text2)}
+.pillow-val{font-size:14px;font-weight:700;color:var(--text)}
+.pillow-input{width:60px;padding:6px 8px;border-radius:var(--Rx);border:1.5px solid var(--border);background:var(--bg-input);color:var(--text);font-size:14px;font-weight:600;font-family:var(--font);text-align:center;transition:var(--T)}
+.pillow-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.pillow-goal{font-size:18px;font-weight:800;color:var(--accent)}
 
-        .type-btn.active[data-type="Расход"] {
-            background: var(--danger-color);
-            color: white;
-            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
-        }
+/* Goal section */
+.goal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+.goal-row:not(:last-child){border-bottom:1px solid var(--border)}
+.goal-label{font-size:13px;color:var(--text2)}
+.goal-val{font-size:14px;font-weight:700;color:var(--text)}
+.goal-input{width:100px;padding:6px 8px;border-radius:var(--Rx);border:1.5px solid var(--border);background:var(--bg-input);color:var(--text);font-size:14px;font-weight:600;font-family:var(--font);text-align:right;transition:var(--T)}
+.goal-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.goal-highlight{font-size:16px;font-weight:800}
 
-        .type-btn.active[data-type="Доход"] {
-            background: var(--success-color);
-            color: white;
-            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
-        }
+/* Chart */
+.chart-wrap{height:200px;margin-top:4px}
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+/* Footer */
+.ft{text-align:center;padding:20px 0 8px;font-size:11px;color:var(--text3)}
 
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--hint-color);
-        }
-
-        input[type="number"], input[type="text"], select {
-            width: 100%;
-            background: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid rgba(156, 163, 175, 0.3);
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--accent-primary);
-        }
-
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-            transition: opacity 0.2s;
-        }
-
-        .submit-btn:active { opacity: 0.8; }
-        .submit-btn:disabled { background: #9ca3af; box-shadow: none; }
-    </style>
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fadeIn .35s ease both}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
 </head>
 <body>
+<div class="c">
 
-    <h1>Мои Финансы</h1>
-    <p class="subtitle">Учет доходов и расходов</p>
+  <div class="hdr fi">
+    <h1>ФИНАНСОВЫЙ РЕНТГЕН</h1>
+    <p>Курс &laquo;Финансовая перезагрузка&raquo; &bull; Марина Дементьева</p>
+  </div>
 
-    <div class="card">
-        <div class="type-selector" id="typeSelector">
-            <div class="type-btn active" data-type="Расход">Расход</div>
-            <div class="type-btn" data-type="Доход">Доход</div>
-        </div>
-
-        <div class="form-group">
-            <label>Сумма ($)</label>
-            <input type="number" id="amount" placeholder="0.00" min="0" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label>Категория</label>
-            <select id="category">
-                <option value="Еда и продукты">Еда и продукты</option>
-                <option value="Жилье">Жилье</option>
-                <option value="Транспорт">Транспорт</option>
-                <option value="Инвестиции">Инвестиции</option>
-                <option value="Развлечения">Развлечения</option>
-                <option value="Зарплата/Бизнес">Зарплата/Бизнес</option>
-                <option value="Другое">Другое</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Комментарий (необязательно)</label>
-            <input type="text" id="comment" placeholder="Например: Покупка продуктов">
-        </div>
-
-        <button class="submit-btn" id="submitBtn" onclick="sendData()">Сохранить запись</button>
+  <!-- A. ДОХОДЫ -->
+  <div class="cd fi" style="animation-delay:.04s">
+    <div class="sec-toggle" onclick="tog('secA')">
+      <div class="cd-label" style="margin-bottom:0"><span class="icon">A.</span> ДОХОДЫ</div>
+      <span class="arrow open" id="arrA">&#9660;</span>
     </div>
+    <div class="sec-body open" id="secA">
+      <div style="height:12px"></div>
+      <div class="row">
+        <div class="row-label">Основная зарплата (чистыми)<span class="row-hint">после налогов</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="0" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="0" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Зарплата супруга / партнёра</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="1" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="1" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Подработки / фриланс</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="2" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="2" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Доход от аренды</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="3" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="3" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Дивиденды / проценты<span class="row-hint">банк, акции</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="4" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="4" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Прочие доходы<span class="row-hint">переводы, подарки</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="5" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="5" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="subtotal">
+        <span class="subtotal-label">Итого доходов (среднее)</span>
+        <span class="subtotal-val" id="totInc">0 BYN</span>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <!-- B. ОБЯЗАТЕЛЬНЫЕ РАСХОДЫ -->
+  <div class="cd fi" style="animation-delay:.08s">
+    <div class="sec-toggle" onclick="tog('secB')">
+      <div class="cd-label" style="margin-bottom:0"><span class="icon">B.</span> ОБЯЗАТЕЛЬНЫЕ РАСХОДЫ</div>
+      <span class="arrow open" id="arrB">&#9660;</span>
+    </div>
+    <div class="sec-body open" id="secB">
+      <div style="height:12px"></div>
+      <div class="row">
+        <div class="row-label">Аренда / ипотека</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="0" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="0" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Коммунальные услуги<span class="row-hint">свет, газ, вода, интернет</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="1" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="1" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Продукты питания</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="2" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="2" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Транспорт / топливо<span class="row-hint">проездной, такси, бензин</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="3" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="3" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Кредиты / рассрочки<span class="row-hint">все платежи по долгам</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="4" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="4" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Обучение детей / детсад</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="5" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="5" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Медицина / страховка</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="6" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="6" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="subtotal">
+        <span class="subtotal-label">Итого обязательных (среднее)</span>
+        <span class="subtotal-val" id="totFix" style="color:var(--red)">0 BYN</span>
+      </div>
+    </div>
+  </div>
 
-        // Ссылка теперь в кавычках!
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVXH-FQVNfG2nNufVcdH3myR2Ej30uN_eDqe2VnmGcATjg5btAb9f1B4Sj9xb0bOl2/exec"; 
-        
-        let currentType = "Расход";
+  <!-- C. ПЕРЕМЕННЫЕ РАСХОДЫ -->
+  <div class="cd fi" style="animation-delay:.12s">
+    <div class="sec-toggle" onclick="tog('secC')">
+      <div class="cd-label" style="margin-bottom:0"><span class="icon">C.</span> ПЕРЕМЕННЫЕ РАСХОДЫ</div>
+      <span class="arrow open" id="arrC">&#9660;</span>
+    </div>
+    <div class="sec-body open" id="secC">
+      <div style="height:12px"></div>
+      <div class="row">
+        <div class="row-label">Кафе, рестораны, доставка</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="0" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="0" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Одежда и обувь</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="1" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="1" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Развлечения / хобби<span class="row-hint">кино, спорт, концерты</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="2" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="2" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Подписки<span class="row-hint">Netflix, Spotify, приложения</span></div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="3" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="3" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Косметика / уход / салоны</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="4" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="4" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Подарки / праздники</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="5" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="5" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-label">Прочие переменные</div>
+        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="6" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="6" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+      </div>
+      <div class="subtotal">
+        <span class="subtotal-label">Итого переменных (среднее)</span>
+        <span class="subtotal-val" id="totVar" style="color:var(--orange)">0 BYN</span>
+      </div>
+    </div>
+  </div>
 
-        // Логика переключения Доход/Расход
-        document.querySelectorAll('.type-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentType = this.getAttribute('data-type');
-                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-            });
-        });
+  <!-- D. ИТОГИ -->
+  <div class="cd res fi" style="animation-delay:.16s">
+    <div class="res-label">ВАША ДЕЛЬТА (свободные деньги)</div>
+    <div class="res-total" id="resDelta">0 BYN</div>
+    <div class="res-grid">
+      <div class="res-box"><div class="res-box-label">Доходы</div><div class="res-box-val" id="resInc">0</div></div>
+      <div class="res-box"><div class="res-box-label">Обязательные</div><div class="res-box-val" id="resFix">0</div></div>
+      <div class="res-box"><div class="res-box-label">Переменные</div><div class="res-box-val" id="resVar">0</div></div>
+    </div>
+  </div>
 
-        // Отправка данных в Google Таблицу
-        async function sendData() {
-            const amount = document.getElementById('amount').value;
-            const category = document.getElementById('category').value;
-            const comment = document.getElementById('comment').value;
-            const btn = document.getElementById('submitBtn');
+  <!-- Chart -->
+  <div class="cd fi" style="animation-delay:.2s">
+    <div class="cd-label">СТРУКТУРА РАСХОДОВ</div>
+    <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+  </div>
 
-            if (!amount || amount <= 0) {
-                tg.showAlert("Пожалуйста, введите корректную сумму.");
-                return;
-            }
+  <!-- E. ПОДУШКА -->
+  <div class="cd fi" style="animation-delay:.24s">
+    <div class="cd-label"><span class="icon">E.</span> ПОДУШКА БЕЗОПАСНОСТИ</div>
+    <div class="pillow-row">
+      <span class="pillow-label">Месячные расходы</span>
+      <span class="pillow-val" id="pillowExp">0 BYN</span>
+    </div>
+    <div class="pillow-row">
+      <span class="pillow-label">Кол-во месяцев</span>
+      <input class="pillow-input" id="pillowMon" type="number" value="3" min="1" max="12" inputmode="numeric">
+    </div>
+    <div class="pillow-row">
+      <span class="pillow-label" style="font-weight:700">Цель подушки</span>
+      <span class="pillow-goal" id="pillowGoal">0 BYN</span>
+    </div>
+  </div>
 
-            // Блокируем кнопку на время отправки
-            btn.disabled = true;
-            btn.innerText = "Отправка...";
+  <!-- F. ИНВЕСТИЦИОННАЯ ЦЕЛЬ -->
+  <div class="cd fi" style="animation-delay:.28s">
+    <div class="cd-label"><span class="icon">F.</span> ИНВЕСТИЦИОННАЯ ЦЕЛЬ НА 3 ГОДА</div>
+    <div class="goal-row">
+      <span class="goal-label">Ваша цель</span>
+      <div style="display:flex;align-items:center;gap:4px"><input class="goal-input" id="goalSum" type="number" value="5000" inputmode="numeric"><span style="font-size:12px;color:var(--text3)">BYN</span></div>
+    </div>
+    <div class="goal-row">
+      <span class="goal-label">Срок</span>
+      <div style="display:flex;align-items:center;gap:4px"><input class="goal-input" id="goalMon" type="number" value="36" min="1" inputmode="numeric" style="width:70px"><span style="font-size:12px;color:var(--text3)">мес.</span></div>
+    </div>
+    <div class="goal-row">
+      <span class="goal-label">Откладывать в месяц</span>
+      <span class="goal-highlight" id="goalMonthly" style="color:var(--accent)">139 BYN</span>
+    </div>
+    <div class="goal-row">
+      <span class="goal-label">Ваша дельта</span>
+      <span class="goal-val" id="goalDelta">0 BYN</span>
+    </div>
+    <div class="goal-row" style="border-bottom:none">
+      <span class="goal-label" style="font-weight:700">Остаток после откладывания</span>
+      <span class="goal-highlight" id="goalRemain">0 BYN</span>
+    </div>
+  </div>
 
-            const payload = {
-                type: currentType,
-                amount: parseFloat(amount),
-                category: category,
-                comment: comment
-            };
+  <div class="ft">Финансовая Перезагрузка &copy; 2026</div>
+</div>
 
-            try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Это важно для обхода ограничений браузера при работе с Google Scripts
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+<script>
+/* Data: 6 income rows, 7 fix rows, 7 var rows. Each row = [m1, m2] */
+var D={inc:Array.from({length:6},function(){return[0,0]}),fix:Array.from({length:7},function(){return[0,0]}),var_:Array.from({length:7},function(){return[0,0]})};
 
-                // При mode: 'no-cors' ответ будет "opaque", поэтому просто считаем, что всё прошло успешно
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert("Запись успешно добавлена!");
-                
-                // Очищаем форму
-                document.getElementById('amount').value = '';
-                document.getElementById('comment').value = '';
-                
-            } catch (error) {
-                tg.showAlert("Ошибка при отправке: " + error.message);
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Сохранить запись";
-            }
-        }
-    </script>
+/* Telegram */
+var tg=null;
+try{
+  tg=window.Telegram&&window.Telegram.WebApp;
+  if(tg){tg.ready();tg.expand();if(tg.colorScheme==='dark')document.body.classList.add('dark');
+    tg.onEvent('themeChanged',function(){document.body.classList.toggle('dark',tg.colorScheme==='dark');updChart()});
+  }
+}catch(e){}
+if(!tg||!tg.colorScheme){
+  if(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches)document.body.classList.add('dark');
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){document.body.classList.toggle('dark',e.matches);updChart()});
+}
+function haptic(){try{if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred('light')}catch(e){}}
+
+/* Format */
+function fN(n){var v=Math.round(n);return v.toLocaleString('ru-RU')+' BYN'}
+
+/* Toggle sections */
+function tog(id){
+  var el=document.getElementById(id);
+  var arr=document.getElementById('arr'+id.slice(-1));
+  el.classList.toggle('open');
+  arr.classList.toggle('open');
+  haptic();
+}
+
+/* Parse input value */
+function pv(v){var n=parseFloat(v.replace(',','.'));return isNaN(n)?0:n}
+
+/* Sum group average */
+function avgGroup(g){
+  var sum=0;
+  for(var i=0;i<g.length;i++){
+    var m1=g[i][0],m2=g[i][1];
+    if(m1===0&&m2===0)sum+=0;
+    else if(m1===0)sum+=m2;
+    else if(m2===0)sum+=m1;
+    else sum+=(m1+m2)/2;
+  }
+  return sum;
+}
+
+/* Chart */
+var chart=null;
+function chartC(){return document.body.classList.contains('dark')?'#8b949e':'#99a4b8'}
+function initChart(){
+  var ctx=document.getElementById('mainChart');
+  if(!ctx)return;
+  Chart.defaults.font.family=getComputedStyle(document.body).fontFamily;
+  chart=new Chart(ctx.getContext('2d'),{
+    type:'doughnut',
+    data:{
+      labels:['Обязательные','Переменные','Свободные'],
+      datasets:[{data:[1,1,1],backgroundColor:['#e74c3c','#f0932b','#0ea47a'],borderWidth:0,cutout:'68%',borderRadius:4}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:true,position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:14,font:{size:11},color:chartC()}},
+        tooltip:{backgroundColor:'rgba(15,32,39,.92)',titleFont:{size:11},bodyFont:{size:11},padding:10,cornerRadius:8,callbacks:{label:function(c){return c.label+': '+fN(c.raw)}}}
+      },
+      animation:{duration:500,easing:'easeOutQuart'}
+    }
+  });
+}
+function updChart(){
+  if(!chart)return;
+  chart.options.plugins.legend.labels.color=chartC();
+  chart.update('none');
+}
+
+/* Main recalc */
+function recalc(){
+  var inc=avgGroup(D.inc);
+  var fix=avgGroup(D.fix);
+  var vr=avgGroup(D.var_);
+  var totalExp=fix+vr;
+  var delta=inc-totalExp;
+
+  document.getElementById('totInc').textContent=fN(inc);
+  document.getElementById('totFix').textContent=fN(fix);
+  document.getElementById('totVar').textContent=fN(vr);
+
+  document.getElementById('resInc').textContent=fN(inc);
+  document.getElementById('resFix').textContent=fN(fix);
+  document.getElementById('resVar').textContent=fN(vr);
+
+  var de=document.getElementById('resDelta');
+  de.textContent=(delta>=0?'+':'')+fN(delta);
+  de.className='res-total '+(delta>=0?'delta-positive':'delta-negative');
+
+  /* Chart */
+  if(chart){
+    var free=Math.max(delta,0);
+    var d=[fix,vr,free];
+    if(fix===0&&vr===0&&free===0)d=[1,1,1];
+    chart.data.datasets[0].data=d;
+    chart.update();
+  }
+
+  /* Pillow */
+  var pm=parseInt(document.getElementById('pillowMon').value)||3;
+  document.getElementById('pillowExp').textContent=fN(totalExp);
+  document.getElementById('pillowGoal').textContent=fN(totalExp*pm);
+
+  /* Goal */
+  var gs=parseFloat(document.getElementById('goalSum').value)||0;
+  var gm=parseInt(document.getElementById('goalMon').value)||36;
+  var monthly=gm>0?gs/gm:0;
+  document.getElementById('goalMonthly').textContent=fN(monthly);
+  document.getElementById('goalDelta').textContent=fN(delta);
+  var remain=delta-monthly;
+  var re=document.getElementById('goalRemain');
+  re.textContent=(remain>=0?'+':'')+fN(remain);
+  re.style.color=remain>=0?'var(--green)':'var(--red)';
+}
+
+/* Input listeners */
+function setupInputs(){
+  var inputs=document.querySelectorAll('.fin-input');
+  for(var i=0;i<inputs.length;i++){
+    inputs[i].addEventListener('input',function(){
+      var g=this.dataset.g;
+      var idx=parseInt(this.dataset.i);
+      var m=parseInt(this.dataset.m)-1;
+      var val=pv(this.value);
+      if(g==='inc')D.inc[idx][m]=val;
+      else if(g==='fix')D.fix[idx][m]=val;
+      else if(g==='var')D.var_[idx][m]=val;
+      recalc();
+    });
+  }
+  document.getElementById('pillowMon').addEventListener('input',recalc);
+  document.getElementById('goalSum').addEventListener('input',recalc);
+  document.getElementById('goalMon').addEventListener('input',recalc);
+}
+
+/* Save/Load localStorage */
+function saveData(){
+  try{localStorage.setItem('finxray',JSON.stringify(D))}catch(e){}
+  try{localStorage.setItem('finxray_pillow',document.getElementById('pillowMon').value)}catch(e){}
+  try{localStorage.setItem('finxray_goal',JSON.stringify({sum:document.getElementById('goalSum').value,mon:document.getElementById('goalMon').value}))}catch(e){}
+}
+function loadData(){
+  try{
+    var d=JSON.parse(localStorage.getItem('finxray'));
+    if(d&&d.inc){D.inc=d.inc;D.fix=d.fix;D.var_=d.var_}
+  }catch(e){}
+  try{
+    var pm=localStorage.getItem('finxray_pillow');
+    if(pm)document.getElementById('pillowMon').value=pm;
+  }catch(e){}
+  try{
+    var g=JSON.parse(localStorage.getItem('finxray_goal'));
+    if(g){document.getElementById('goalSum').value=g.sum;document.getElementById('goalMon').value=g.mon}
+  }catch(e){}
+  /* Fill inputs from data */
+  var inputs=document.querySelectorAll('.fin-input');
+  for(var i=0;i<inputs.length;i++){
+    var gr=inputs[i].dataset.g;
+    var idx=parseInt(inputs[i].dataset.i);
+    var m=parseInt(inputs[i].dataset.m)-1;
+    var val=0;
+    if(gr==='inc')val=D.inc[idx][m];
+    else if(gr==='fix')val=D.fix[idx][m];
+    else if(gr==='var')val=D.var_[idx][m];
+    if(val>0)inputs[i].value=val;
+  }
+}
+
+/* Auto-save on every change */
+var saveTimer=null;
+function autoSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveData,500)}
+
+document.addEventListener('DOMContentLoaded',function(){
+  loadData();
+  setupInputs();
+  initChart();
+  recalc();
+  /* Auto-save */
+  document.addEventListener('input',autoSave);
+});
+</script>
 </body>
 </html>
