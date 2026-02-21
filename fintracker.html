@@ -208,4 +208,34 @@
             const payload = {
                 type: currentType,
                 amount: parseFloat(amount),
-                category: category
+                category: category,
+                comment: comment
+            };
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Это важно для обхода ограничений браузера при работе с Google Scripts
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // При mode: 'no-cors' ответ будет "opaque", поэтому просто считаем, что всё прошло успешно
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                tg.showAlert("Запись успешно добавлена!");
+                
+                // Очищаем форму
+                document.getElementById('amount').value = '';
+                document.getElementById('comment').value = '';
+                
+            } catch (error) {
+                tg.showAlert("Ошибка при отправке: " + error.message);
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Сохранить запись";
+            }
+        }
+    </script>
+</body>
+</html>
