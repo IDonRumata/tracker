@@ -48,9 +48,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .row:last-child{margin-bottom:0}
 .row-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
 .row-hint{font-size:10px;color:var(--text3);font-weight:400}
-.row-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row-inputs{display:grid;grid-template-columns:1fr;gap:8px}
 .row-inputs.single{grid-template-columns:1fr}
-.col-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:3px}
 .fin-input{width:100%;padding:9px 12px;border-radius:var(--Rx);border:1.5px solid var(--border);background:var(--bg-input);color:var(--text);font-size:14px;font-weight:500;font-family:var(--font);transition:var(--T);text-align:right}
 .fin-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
 .fin-input::placeholder{color:var(--text3);font-weight:400}
@@ -119,30 +118,30 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
       <div style="height:12px"></div>
       <div class="row">
         <div class="row-label">Основная зарплата (чистыми)<span class="row-hint">после налогов</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="0" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="0" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="inc" data-i="0" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Зарплата супруга / партнёра</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="1" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="1" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="inc" data-i="1" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Подработки / фриланс</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="2" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="2" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="inc" data-i="2" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Доход от аренды</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="3" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="3" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="inc" data-i="3" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Дивиденды / проценты<span class="row-hint">банк, акции</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="4" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="4" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="inc" data-i="4" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Прочие доходы<span class="row-hint">переводы, подарки</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="inc" data-i="5" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="inc" data-i="5" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="inc" data-i="5" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="subtotal">
-        <span class="subtotal-label">Итого доходов (среднее)</span>
+        <span class="subtotal-label">Итого доходов (в месяц)</span>
         <span class="subtotal-val" id="totInc">0 BYN</span>
       </div>
     </div>
@@ -158,34 +157,34 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
       <div style="height:12px"></div>
       <div class="row">
         <div class="row-label">Аренда / ипотека</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="0" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="0" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="fix" data-i="0" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Коммунальные услуги<span class="row-hint">свет, газ, вода, интернет</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="1" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="1" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="fix" data-i="1" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Продукты питания</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="2" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="2" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="fix" data-i="2" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Транспорт / топливо<span class="row-hint">проездной, такси, бензин</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="3" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="3" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="fix" data-i="3" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Кредиты / рассрочки<span class="row-hint">все платежи по долгам</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="4" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="4" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="fix" data-i="4" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Обучение детей / детсад</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="5" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="5" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="fix" data-i="5" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Медицина / страховка</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="fix" data-i="6" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="fix" data-i="6" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="fix" data-i="6" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="subtotal">
-        <span class="subtotal-label">Итого обязательных (среднее)</span>
+        <span class="subtotal-label">Итого обязательных (в месяц)</span>
         <span class="subtotal-val" id="totFix" style="color:var(--red)">0 BYN</span>
       </div>
     </div>
@@ -201,34 +200,34 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
       <div style="height:12px"></div>
       <div class="row">
         <div class="row-label">Кафе, рестораны, доставка</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="0" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="0" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="var" data-i="0" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Одежда и обувь</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="1" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="1" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="var" data-i="1" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Развлечения / хобби<span class="row-hint">кино, спорт, концерты</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="2" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="2" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="var" data-i="2" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Подписки<span class="row-hint">Netflix, Spotify, приложения</span></div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="3" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="3" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="var" data-i="3" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Косметика / уход / салоны</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="4" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="4" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="var" data-i="4" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Подарки / праздники</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="5" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="5" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="var" data-i="5" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="row">
         <div class="row-label">Прочие переменные</div>
-        <div class="row-inputs"><div><div class="col-label">Месяц 1</div><input class="fin-input" data-g="var" data-i="6" data-m="1" placeholder="0" inputmode="decimal"></div><div><div class="col-label">Месяц 2</div><input class="fin-input" data-g="var" data-i="6" data-m="2" placeholder="0" inputmode="decimal"></div></div>
+        <div class="row-inputs"><input class="fin-input" data-g="var" data-i="6" placeholder="0" inputmode="decimal"></div>
       </div>
       <div class="subtotal">
-        <span class="subtotal-label">Итого переменных (среднее)</span>
+        <span class="subtotal-label">Итого переменных (в месяц)</span>
         <span class="subtotal-val" id="totVar" style="color:var(--orange)">0 BYN</span>
       </div>
     </div>
@@ -297,8 +296,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 </div>
 
 <script>
-/* Data: 6 income rows, 7 fix rows, 7 var rows. Each row = [m1, m2] */
-var D={inc:Array.from({length:6},function(){return[0,0]}),fix:Array.from({length:7},function(){return[0,0]}),var_:Array.from({length:7},function(){return[0,0]})};
+/* Data: 6 income rows, 7 fix rows, 7 var rows. Single value per row */
+var D={inc:Array.from({length:6},function(){return 0}),fix:Array.from({length:7},function(){return 0}),var_:Array.from({length:7},function(){return 0})};
 
 /* Telegram */
 var tg=null;
@@ -329,16 +328,10 @@ function tog(id){
 /* Parse input value */
 function pv(v){var n=parseFloat(v.replace(',','.'));return isNaN(n)?0:n}
 
-/* Sum group average */
-function avgGroup(g){
+/* Sum group */
+function sumGroup(g){
   var sum=0;
-  for(var i=0;i<g.length;i++){
-    var m1=g[i][0],m2=g[i][1];
-    if(m1===0&&m2===0)sum+=0;
-    else if(m1===0)sum+=m2;
-    else if(m2===0)sum+=m1;
-    else sum+=(m1+m2)/2;
-  }
+  for(var i=0;i<g.length;i++) sum+=g[i];
   return sum;
 }
 
@@ -373,9 +366,9 @@ function updChart(){
 
 /* Main recalc */
 function recalc(){
-  var inc=avgGroup(D.inc);
-  var fix=avgGroup(D.fix);
-  var vr=avgGroup(D.var_);
+  var inc=sumGroup(D.inc);
+  var fix=sumGroup(D.fix);
+  var vr=sumGroup(D.var_);
   var totalExp=fix+vr;
   var delta=inc-totalExp;
 
@@ -424,11 +417,10 @@ function setupInputs(){
     inputs[i].addEventListener('input',function(){
       var g=this.dataset.g;
       var idx=parseInt(this.dataset.i);
-      var m=parseInt(this.dataset.m)-1;
       var val=pv(this.value);
-      if(g==='inc')D.inc[idx][m]=val;
-      else if(g==='fix')D.fix[idx][m]=val;
-      else if(g==='var')D.var_[idx][m]=val;
+      if(g==='inc')D.inc[idx]=val;
+      else if(g==='fix')D.fix[idx]=val;
+      else if(g==='var')D.var_[idx]=val;
       recalc();
     });
   }
@@ -461,11 +453,10 @@ function loadData(){
   for(var i=0;i<inputs.length;i++){
     var gr=inputs[i].dataset.g;
     var idx=parseInt(inputs[i].dataset.i);
-    var m=parseInt(inputs[i].dataset.m)-1;
     var val=0;
-    if(gr==='inc')val=D.inc[idx][m];
-    else if(gr==='fix')val=D.fix[idx][m];
-    else if(gr==='var')val=D.var_[idx][m];
+    if(gr==='inc')val=D.inc[idx];
+    else if(gr==='fix')val=D.fix[idx];
+    else if(gr==='var')val=D.var_[idx];
     if(val>0)inputs[i].value=val;
   }
 }
