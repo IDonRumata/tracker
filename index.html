@@ -98,6 +98,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .fi{animation:fadeIn .35s ease both}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.cur-grid{display:flex;flex-wrap:wrap;gap:6px}
+.cur-btn{padding:6px 10px;border-radius:var(--Rx);border:1.5px solid var(--border);background:var(--bg-input);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:var(--T);user-select:none;-webkit-user-select:none}
+.cur-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px var(--accent-glow)}
+.cur-btn:active{transform:scale(.95)}
 </style>
 </head>
 <body>
@@ -105,7 +110,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 
   <div class="hdr fi">
     <h1>ФИНАНСОВЫЙ РЕНТГЕН</h1>
-    <p>Курс &laquo;Финансовая перезагрузка&raquo; &bull; Марина Дементьева</p>
+    <p>Графин &bull; грамотность финансовая</p>
+  </div>
+
+  <!-- Currency selector -->
+  <div class="cd fi" style="animation-delay:.02s;padding:12px 18px">
+    <div class="cd-label" style="margin-bottom:8px"><span class="icon">💱</span> ВАЛЮТА</div>
+    <div class="cur-grid" id="curGrid">
+      <div class="cur-btn active" data-cur="BYN">🇧🇾 BYN</div>
+      <div class="cur-btn" data-cur="RUB">🇷🇺 RUB</div>
+      <div class="cur-btn" data-cur="UAH">🇺🇦 UAH</div>
+      <div class="cur-btn" data-cur="KZT">🇰🇿 KZT</div>
+      <div class="cur-btn" data-cur="PLN">🇵🇱 PLN</div>
+      <div class="cur-btn" data-cur="EUR">🇪🇺 EUR</div>
+      <div class="cur-btn" data-cur="USD">🇺🇸 USD</div>
+    </div>
   </div>
 
   <!-- A. ДОХОДЫ -->
@@ -272,7 +291,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
     <div class="cd-label"><span class="icon">F.</span> ИНВЕСТИЦИОННАЯ ЦЕЛЬ НА 3 ГОДА</div>
     <div class="goal-row">
       <span class="goal-label">Ваша цель</span>
-      <div style="display:flex;align-items:center;gap:4px"><input class="goal-input" id="goalSum" type="number" value="5000" inputmode="numeric"><span style="font-size:12px;color:var(--text3)">BYN</span></div>
+      <div style="display:flex;align-items:center;gap:4px"><input class="goal-input" id="goalSum" type="number" value="5000" inputmode="numeric"><span style="font-size:12px;color:var(--text3)" data-cur-label>BYN</span></div>
     </div>
     <div class="goal-row">
       <span class="goal-label">Срок</span>
@@ -292,7 +311,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
     </div>
   </div>
 
-  <div class="ft">Финансовая Перезагрузка &copy; 2026</div>
+  <div class="ft">Графин &copy; 2026</div>
 </div>
 
 <script>
@@ -313,8 +332,19 @@ if(!tg||!tg.colorScheme){
 }
 function haptic(){try{if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred('light')}catch(e){}}
 
+/* Currency */
+var CUR='BYN';
+function setCurrency(c){
+  CUR=c;
+  document.querySelectorAll('.cur-btn').forEach(function(b){b.classList.toggle('active',b.dataset.cur===c)});
+  document.querySelectorAll('[data-cur-label]').forEach(function(el){el.textContent=c});
+  recalc();
+  haptic();
+  try{localStorage.setItem('finxray_cur',c)}catch(e){}
+}
+
 /* Format */
-function fN(n){var v=Math.round(n);return v.toLocaleString('ru-RU')+' BYN'}
+function fN(n){var v=Math.round(n);return v.toLocaleString('ru-RU')+' '+CUR}
 
 /* Toggle sections */
 function tog(id){
@@ -466,6 +496,12 @@ var saveTimer=null;
 function autoSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveData,500)}
 
 document.addEventListener('DOMContentLoaded',function(){
+  /* Currency selector */
+  document.querySelectorAll('.cur-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){setCurrency(this.dataset.cur)});
+  });
+  try{var sc=localStorage.getItem('finxray_cur');if(sc)setCurrency(sc)}catch(e){}
+
   loadData();
   setupInputs();
   initChart();
